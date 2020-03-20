@@ -1,4 +1,4 @@
-import { UserAcrionTypes } from './UserActionTypes';
+import { UserTypes } from './UserTypes';
 
 const INITIAL_STATE = {
   currentUser: null
@@ -6,7 +6,7 @@ const INITIAL_STATE = {
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch(action.type) {
-    case UserAcrionTypes.SET_CURRENT_USER:
+    case UserTypes.SET_CURRENT_USER:
       return {
         ...state,
         currentUser: action.payload

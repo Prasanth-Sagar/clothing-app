@@ -13,14 +13,24 @@ var config = {
   measurementId: "G-PMN494KKXR"
 };
 
+// The below function stores the user auth object when we sign in with google and stores it in the database
+
 export const createUserProfileDocument = async(userAuth, additionalData) => {
   if(!userAuth) return;
   const userRef = firestore.doc(`users/${userAuth.uid}`);
-  const snapShot = await userRef.get();
-
+  const colletionRef = firestore.collection('users');
   // console.log(firestore.doc('users/123dfdj53hvh'))
-  console.log('Snapshot --> ', snapShot);
 
+  const snapShot = await userRef.get();
+  console.log('Snapshot --> ', snapShot);
+  console.log('Snapshop data --> ', snapShot.data());
+  const collectionSnapshot = await colletionRef.get();
+  // console.log('COLLECTION SNAPSHOT IS --> ', collectionSnapshot.docs[0].data());
+  // console.log('COLLECTION SNAPSHOT IS --> ', collectionSnapshot.docs.map(doc => doc.data()));
+  const cData = {collection: collectionSnapshot.docs.map(doc => doc.data())};
+  console.log('cData --> ', cData);
+
+  // The below code creates a snapshot if it doesn't exist
   if(!snapShot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -41,7 +51,25 @@ export const createUserProfileDocument = async(userAuth, additionalData) => {
   return userRef;
 }
 
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+  const collectionRef = firestore.collection(collectionKey);
+  console.log('COLLECTIONREF --> ', collectionRef);
+  console.log('OBJECTSTOADD --> ', objectsToAdd);
+  const batch = firestore.batch();
+  objectsToAdd.forEach(obj => {
+    const newDocRef = collectionRef.doc();
+    batch.set(newDocRef, obj);
+  });
+  return await batch.commit()
+}
+
 firebase.initializeApp(config);
+
+// firebase.database().ref.set({
+//   name: 'Victoria'
+// })
+
+
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
